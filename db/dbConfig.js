@@ -1,4 +1,10 @@
 const mongoose = require('mongoose')
-const conn = mongoose.connect('mongodb+srv://aakashs67:aakash@ecom.3q4pnse.mongodb.net/Ecommerce')
+async function connectionDB() {
+    try {
+       await mongoose.connect(process.env.MONGODB_URI)
+    } catch (error) {
+        console.log(error)
+    }
+}
+module.exports = connectionDB
 
-module.exports = conn
