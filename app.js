@@ -2,12 +2,12 @@ const express = require('express')
 const mongoose = require('mongoose')
 const EarphoneModel = require('./model/earphone')
 const cors = require('cors')
+const conn = require('./db/dbConfig')
 
 const app = express()
 
 app.use(cors());    
 
-const conn = mongoose.connect('mongodb+srv://aakashs67:aakash@ecom.3q4pnse.mongodb.net/Ecommerce')
 
 app.get("/getearphone", (req, res) => {
    
@@ -29,7 +29,8 @@ app.get("/getearphone", (req, res) => {
 // });
 
 app.post("/postearphone",(req,res)=>{
-    try {
+    try { 
+
         const earphoneData = req.body;
         console.log(earphoneData)
     const earphone = EarphoneModel.create(earphoneData)
@@ -41,8 +42,10 @@ app.post("/postearphone",(req,res)=>{
 
 
 app.listen(8000, () => {
-    try {
+    try { 
+        conn
         console.log("Express Server is running on port 8000")
+        console.log("DB connected Successfully");
     } catch (error) {
         console.log("Server Error")
     }
