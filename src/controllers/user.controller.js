@@ -1,44 +1,61 @@
 const UserModel = require("../models/user.model");
-const bcrypt = require('bcryptjs')
-
+const bcrypt = require('bcryptjs');
 
 const userSignUp = async (req, res) => {
     try {
-        const {name, email, password} = req.body
+        const { name, email, password } = req.body;
 
-        if (!name) {
-           console.log("Please provide your name");
-        }
-        if (!email) {
-            console.log("Please provide your email");
-        }
-        if (!password) {
-            console.log("Please provide your password");
+        // Validate input
+        if (!name || !email || !password) {
+            return res.status(400).json({
+                success: false,
+                error: true,
+                message: "Please provide name, email, and password",
+            });
         }
 
-        const salt = bcrypt.genSaltSync(10);
-        const hashedPassword = await bcrypt.hashSync(password, salt);
-
-        if(!hashedPassword){
-            throw new Error("Something went wrong")
+        // Check if user already exists
+        const checkEmail = await UserModel.findOne({ email });
+        if (checkEmail) {
+            return res.status(409).json({
+                success: false,
+                error: true,
+                message: "User with this email already exists",
+            });
         }
-        
+
+        // Hash the password
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
         // Create user object with hashed password
         const user = new UserModel({
-            email: email,
+            name,
+            email,  
             password: hashedPassword,
-            name: name
         });
 
         // Save user to database
         const savedUser = await user.save();
 
-        res.status(200).json(savedUser);
-
-
-    } catch (error) {
-        res.status(400).json(error)
+        res.status(201).json({
+            data: savedUser,
+            success: true,
+            error: false,
+            message: "User created successfully!",
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            error: true,
+            message: err.message || "Internal Server Error",
+        });
     }
+};
+
+const userSignIn = async(req, res)=>{
+const {email, password} = req.body
+
 }
 
-module.exports = userSignUp
+module.exports = {userSignUp, userSignIn};
